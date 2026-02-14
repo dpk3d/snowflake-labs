@@ -31,49 +31,31 @@ SHOW TASKS IN deepak_task_db.public;
 USE DATABASE deepak_task_db;
 
 
-
-
-
-
-
 -- ========================================
 -- VIEW ALL TASK EXECUTION HISTORY
 -- ========================================
 
--- Deepak's monitoring: See all recent task executions
-SELECT *
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY())
+-- Deepak's monitoring: See all-- Deepak's monitoring: See all-- Deepak'sE(INFORMATION_SCHEMA.TASK_HISTORY())
 ORDER BY scheduled_time DESC;
 
 -- Deepak's learning: Shows all task runs across database
 -- Columns include:
--- - name: Task name
--- - database_name, schema_name: Location
--- - query_id: Unique execution ID
--- - scheduled_time: When task was scheduled
--- - completed_time: When task finished
--- - state: SUCCESS, FAILED, SKIPPED
+-- - name-- - name-- - name--ab-- - nam, schema_name: Location
+-- - query_id: Unique executi-- - query_id: Unique executi-- - queras scheduled
+-- - completed_time: -- - completed_time: -- state: SUCCESS, FAILED, SKIPPED
 -- - error_code, error_message: If failed
 -- - query_text: SQL that ran
 
 
--- ========================================
--- FILTER BY SPECIFIC TASK
--- ========================================
+-- ==========================-- ==========================-- ==========================-- ========================
 
--- Deepak's scenario: Check history for specific task
--- Last 4 hours, limit to 5 results
-SELECT
+-- Deepak's scenario: Check history for specific tas-- Deepak's scenario: Check history for spCT
     name,
     scheduled_time,
-    completed_time,
-    state,
-    DATEDIFF('second', scheduled_time, completed_time) AS duration_seconds,
-    error_code,
+    completed_t    completed_t    completed_t    cd',    completed_t    completed_t    completed_t    cd',     error_code,
     error_message,
     query_id
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
-    SCHEDULED_TIME_RANGE_START => DATEADD('hour', -4, CURRENT_TIMESTAMP()),
+FROM TABLE(INFORMATION_SCHEMA.TASFROM TABLE(INFORMATION_SCHEMA.TASGE_START => DATEADD('hour', -4, CURRENT_TIMESTAMP()),
     RESULT_LIMIT => 5,
     TASK_NAME => 'DEEPAK_CUSTOMER_CLEAN'
 ))
@@ -95,29 +77,25 @@ SELECT
     completed_time,
     state,
     error_message
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
-    SCHEDULED_TIME_RANGE_START => TO_TIMESTAMP_LTZ('2026-02-14 10:00:00.000 -0800'),
-    SCHEDULED_TIME_RANGE_END => TO_TIMESTAMP_LTZ('2026-02-14 12:00:00.000 -0800')
+FROM TABLE(INFORMATIONFROM TABLE(INFORMATIONFROM TABLE(INFORMATIONFROM TABLE(INFORMATIONFROM TABLE(INFORMATIONFROM TABLE(INFORMATIONFROHEDULED_TIME_RANGE_END => TO_TIMESTAMP_LTZ('2026-02-14 12:00:00.000 -0800')
 ))
-ORDER BY scheduled_time DESC;
+ORDER BY scheduled_tiOe DESC;
 
--- Deepak's observation: Shows all task executions in 2-hour window
+
+R Deepak's observation: Shows all task executions in 2-hour window
 -- Useful for troubleshooting specific time periods
 
 
--- ========================================
--- CHECK CURRENT TIMESTAMP
+-- ==================-- ================-- ========K CURRENT TIMESTAMP
 -- ========================================
 
 -- Deepak's utility: Get current timestamp in LTZ format
-SELECT TO_TIMESTAMP_LTZ(CURRENT_TIMESTAMP()) AS current_time_ltz;
+-- Deepak's utility: TZ(CURRENT_TIMESTAMP()) AS current_time_ltz;
 
 -- Deepak's note: Useful for constructing time range queries
 
 
--- ========================================
--- MONITOR TASK SUCCESS/FAILURE
--- ========================================
+-- ============-- ============-- ============-- ========AS-- ============-- ============-==============================
 
 -- Deepak's monitoring: See only failed tasks
 SELECT
@@ -127,8 +105,8 @@ SELECT
     error_code,
     error_message,
     query_text
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
-    SCHEDULED_TIME_RANGE_START => DATEADD('day', -1, CURRENT_TIMESTAMP())
+FROFROFRLE(INFORMATIFROFROFRLE(INFORMATORY(
+    SCHEDULED_TI    SCHEDSTART => DATEADD('day', -1, CURRENT_TIMESTAMP())
 ))
 WHERE state = 'FAILED'
 ORDER BY scheduled_time DESC;
@@ -137,14 +115,12 @@ ORDER BY scheduled_time DESC;
 -- Shows what went wrong and when
 
 
--- Deepak's monitoring: Task success rate
-SELECT
+-- Deepak's monitoring: Task success rate-SELECT
     name,
     COUNT(*) AS total_runs,
     SUM(CASE WHEN state = 'SUCCEEDED' THEN 1 ELSE 0 END) AS successful_runs,
     SUM(CASE WHEN state = 'FAILED' THEN 1 ELSE 0 END) AS failed_runs,
-    ROUND(100.0 * SUM(CASE WHEN state = 'SUCCEEDED' THEN 1 ELSE 0 END) / COUNT(*), 2) AS success_rate_pct
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
+    ROUND(100.0 * SUM(CASE WHEN state = 'SUCCEEDED' THEN 1 ELSE 0 END) / COUNT(    ROUND(100.0 * SUM(CASE WHEN state = 'SUCCEEDED' THMA.TASK_HISTORY(
     SCHEDULED_TIME_RANGE_START => DATEADD('day', -7, CURRENT_TIMESTAMP())
 ))
 GROUP BY name
@@ -154,48 +130,24 @@ ORDER BY failed_runs DESC;
 -- Helps identify problematic tasks
 
 
--- ========================================
--- ANALYZE TASK PERFORMANCE
+-- =====================-- =====================-- =================NCE
 -- ========================================
 
--- Deepak's analysis: Average execution time per task
-SELECT
-    name,
-    COUNT(*) AS execution_count,
-    AVG(DATEDIFF('second', scheduled_time, completed_time)) AS avg_duration_seconds,
+-- Deepak's analy-- Deepak's analyut-- Deepak's ata-- Deepak's analy-- Deepak's analyut-- Deeion_count,
+    AVG(DATEDIFF('second', scheduled_time, completed_time)) AS av _duration_seconds,
     MIN(DATEDIFF('second', scheduled_time, completed_time)) AS min_duration_seconds,
-    MAX(DATEDIFF('second', scheduled_time, completed_time)) AS max_duration_seconds
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
-    SCHEDULED_TIME_RANGE_START => DATEADD('day', -7, CURRENT_TIMESTAMP())
+    MAX(DATEDIFF('second', scheduled    MAX(DATEDIFF('second', scheduled    MAX(DAT
+FFFM TABLE(INFORMATION_SCHEMA.TASK_HISTFFFM TABLE(INFORMATION_SCHEMA.TASK_HISTFFFM TABLE(INFORMATION_SCHEMA.TASK_H())
 ))
 WHERE state = 'SUCCEEDED'
 GROUP BY name
-ORDER BY avg_duration_seconds DESC;
-
--- Deepak's learning: Identify slow tasks
--- Helps optimize warehouse sizing
-
-
-/*
-DEEPAK'S TASK MONITORING INSIGHTS:
-===================================
-
-TASK_HISTORY() Function:
-
-Purpose:
-- View execution history of tasks
-- Monitor success/failure rates
-- Troubleshoot errors
-- Analyze performance
-
-Key Parameters:
+ORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_===ORDER BY avg_duration_secORDER BY avg_duration_secORDER BY avg_duration_orO oORDER BY avgnitor success/failure rates
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - ers:
 
 1. SCHEDULED_TIME_RANGE_START:
    - Start of time window
    - Required for filtering
-   - Use DATEADD() for relative times
-
-2. SCHEDULED_TIME_RANGE_END:
+   - Use DATEADD() fo   - Use DATEADD() fo   - Use DATEADD() foEND:
    - End of time window
    - Optional (defaults to current time)
 
@@ -211,42 +163,24 @@ Key Parameters:
 
 Important Columns:
 
-- NAME: Task name
-- STATE: SUCCEEDED, FAILED, SKIPPED, CANCELLED
-- SCHEDULED_TIME: When task was scheduled to run
+- NAME: Task - NAME: Task - NAME: Task - NAME: Task - NAME: Task - NAME: Task - NAME: Task - NAs scheduled to run
 - COMPLETED_TIME: When task finished
 - QUERY_ID: Unique execution identifier
-- ERROR_CODE: Error code if failed
-- ERROR_MESSAGE: Error description
-- QUERY_TEXT: SQL that was executed
-- DATABASE_NAME, SCHEMA_NAME: Task location
-
-Task States:
-
-✅ SUCCEEDED: Task completed successfully
-❌ FAILED: Task encountered error
-⏭️ SKIPPED: Task skipped (condition not met)
-🚫 CANCELLED: Task manually cancelled
-
-Common Monitoring Queries:
+- ERROR_CODE: Error code-if- ERROR_CODE: ErroSSAGE: Error descripti- ERROR_CODE: Error code-if- ERROR_CODE: ErroSSAGE: Error descripti- ERROR_CODE: Error code-if- ERROR_CODE: ErroSSAGE: Error descripti- ERROR_CODE: Error code-if- ERROR_CODE: ErroSSAGE: Error descripti- ERROR_CODE: Error code-if- ERROR_CODE: ErroSSAGE: Error descripti- ERROR_CODE: Error cos:
 
 1. Recent Executions:
-   SELECT * FROM TABLE(TASK_HISTORY())
-   ORDER BY scheduled_time DESC LIMIT 10;
+   SELECT * FROM TABLE(TASK_HISTORY())   SELECT * FROM TABLE(TASK_HESC LIMIT 10;
 
 2. Failed Tasks Today:
-   SELECT * FROM TABLE(TASK_HISTORY(
-       SCHEDULED_TIME_RANGE_START => CURRENT_DATE()
+   SELECT * FROM T   SELENT_DATE()
    ))
    WHERE state = 'FAILED';
 
 3. Specific Task Last Hour:
    SELECT * FROM TABLE(TASK_HISTORY(
-       SCHEDULED_TIME_RANGE_START => DATEADD('hour', -1, CURRENT_TIMESTAMP()),
+       SCHEDULED_TIME_RANGE_START => DATEADD('h       SCHEDRRENT_TIMESTAMP()),
        TASK_NAME => 'MY_TASK'
-   ));
-
-4. Success Rate:
+                   Rate:
    SELECT
        name,
        COUNT(*) AS total,
@@ -256,8 +190,7 @@ Common Monitoring Queries:
 
 Best Practices:
 
-1. Regular Monitoring:
-   - Check task history daily
+1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.istory daily
    - Set up alerts for failures
    - Track success rates
 
@@ -278,65 +211,42 @@ Best Practices:
 
 5. Documentation:
    - Document expected behavior
-   - Note normal execution times
-   - Track changes over time
+   - Note norma   - Note norma   - N- Track changes over time
 
 Troubleshooting Workflow:
 
 1. Identify Problem:
-   - Check for failed tasks
-   - Review error messages
-   - Note when failures started
-
-2. Analyze Context:
-   - Check task dependencies
+   - Check for f   -d    - Check for f   -d    essages
+   - Note when failures   - Note when failures   - Note whCheck task dependencies
    - Review recent changes
    - Verify data availability
-
-3. Fix Issue:
-   - Correct SQL errors
-   - Adjust warehouse size
-   - Fix data quality issues
+   - Verify data availabili SQL errors
+   - Adjust warehouse size   - Adjustata quality issues
 
 4. Verify Fix:
    - Monitor next execution
    - Check success rate
    - Validate results
 
-Real-World Example:
-
--- Daily monitoring dashboard
-SELECT
-    name,
-    COUNT(*) AS runs_today,
-    SUM(IFF(state = 'SUCCEEDED', 1, 0)) AS successful,
+Real-Real-Real-Real-
+-- Daily monitoring -- Daily monitoring -- Daily monitoring -- Daily oday,
+    SUM(IFF(state = 'SUCCEEDED    SUM(IFF(state = 'SU,
     SUM(IFF(state = 'FAILED', 1, 0)) AS failed,
-    AVG(DATEDIFF('second', scheduled_time, completed_time)) AS avg_seconds,
-    MAX(completed_time) AS last_run
-FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
+    AVG(DATEDIFF('second', sched    AVG(DATEDIFF('second', scS a    AVG(DATEDIFFMAX(completed_time) AS last_ru    AVG(DATEDIFF('sATION_SCHEMA.TASK_HISTORY(
     SCHEDULED_TIME_RANGE_START => CURRENT_DATE()
 ))
 GROUP BY name
-ORDER BY failed DESC, name;
-
-Common Issues:
-
-❌ Task not appearing in history
+ORDER BY failed DESC, nameORDER BY failed DESC, nameORDER BppeORDER BY failed 
    → Task never ran (check if RESUMED)
    → Check correct database/schema
 
 ❌ Too many results
-   → Add RESULT_LIMIT parameter
-   → Narrow time range
-   → Filter by task name
-
-❌ Missing recent executions
+   → Add RESULT_LIMIT   → Add RESULT_Lar   → Add RESULT_LIMIT   → Add RESULT_Lar   Missing recent executions
    → History may have delay
    → Wait a few minutes
    → Refresh query
 
-Key Takeaway:
-TASK_HISTORY() is essential for monitoring
+Key Takeaway:Key Takeaway:Key Takeaway:Ke for monitoring
 automated workflows. Use it to track success
 rates, identify failures, and optimize
 performance. Regular monitoring prevents
@@ -345,6 +255,3 @@ issues and ensures reliable automation!
 Practiced: February 2026
 Status: ✅ Completed - Task monitoring mastered
 */
-  
-  
- 
